@@ -2,23 +2,37 @@ version: '3.7'
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1-arm64
     container_name: elasticsearch
+    mem_limit: 512m      # 메모리 제한 512MB
+    cpus: 0.25           # CPU 제한 0.25 코어
+    user: "1000:1000"
     environment:
       - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m" # 메모리 설정
+      #- "xpack.ilm.enabled=true" # ILM 활성화
+      #- "xpack.ilm.rollover_alias=my_logs" # ILM 일자 별 최신 로깅 데이터가 my_logs를 가르키게 된다.
+      #- "xpack.ilm.policy.my_policy.hot.phase.min_age=1d" # 1일 단위로 로깅
+      #- "xpack.ilm.policy.my_policy.hot.phase.actions.rollover.max_age=7d" # 7일간 보관 후 삭제
       #- network.host=0.0.0.0
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
     ports:
       - "9200:9200"
       - "9300:9300"
     volumes:
       - ./es/data:/usr/share/elasticsearch/data   # es 데이터가 적재될 폴더 마운트
-      - ./es/init-script:/usr/local/bin/init-script  # 초기 데이터 셋 구성을 위한 스크립트 마운트
+      #- ./es/logs:/usr/share/elasticsearch/logs   # es 로그
     networks:
       - elastic
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.0
+    image: docker.elastic.co/kibana/kibana:7.16.1-arm64
     container_name: kibana
+    mem_limit: 512m      # 메모리 제한 512MB
+    cpus: 0.256           # CPU 제한 0.256 코어
     ports:
       - "5601:5601"
     networks:

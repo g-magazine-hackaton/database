@@ -33,6 +33,9 @@ services:
     container_name: kibana
     mem_limit: 512m      # 메모리 제한 512MB
     cpus: 0.256           # CPU 제한 0.256 코어
+    environment:
+      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+      - "xpack.encryptedSavedObjects.encryptionKey=abcde12345fghik67899lmnop12345qrstivwxyz"
     ports:
       - "5601:5601"
     networks:
